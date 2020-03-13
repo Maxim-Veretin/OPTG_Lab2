@@ -31,4 +31,5 @@ function init()
     camera.position.set(5, 5, 5);
     // точка, на которую смотрит камера
     camera.lookAt(new THREE.Vector3(0, 0, 0));
+    //tfddcuydf
 }
