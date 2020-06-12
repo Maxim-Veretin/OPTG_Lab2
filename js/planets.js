@@ -1,6 +1,7 @@
 //#region переменные
 var container;
 var camera, scene, renderer;
+var cameraOrtho, sceneOrtho;
 //var camera2, helper;
 
 var loader = new THREE.TextureLoader();
@@ -14,10 +15,10 @@ var keyboard = new THREEx.KeyboardState();
 var keyDown = 0;
 var cameraAngle = 0;
 
-var cameraOrtho, sceneOrtho;
-
 var width = window.innerWidth;
 var height = window.innerHeight;
+
+var infoArr = [];
 //#endregion
 
 // функция инициализации камеры, отрисовщика, объектов сцены и т.д.
@@ -40,7 +41,7 @@ function init()
 
     //FOV камеры, соотношение сторон, полоскости отсечения
     camera = new THREE.PerspectiveCamera(
-        45, window.innerWidth / window.innerHeight, 4, 4000 );
+        45, width/height, 4, 4000 );
     // установка позиции камеры
     camera.position.set(0, 1398, -1398);
     
@@ -76,14 +77,14 @@ function init()
     spotlight.shadow.mapSize.height = 2048;
     scene.add(spotlight);
     
-    //render.autoClear = false;
+    renderer.autoClear = false;
 
     //var light = new THREE.AmbientLight( 0x202020 ); // soft white light
     //scene.add( light );
 
     AddSolarSystem();
     
-    for(var i = 1; i < spaseArr.length; i++)
+    for(var i = 1; i < spaseArr.length-1; i++)
     {
         DrawOrbit(spaseArr[i]);
     }
@@ -96,22 +97,23 @@ function onWindowResize()
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
 
-    cameraOrtho.left = -window.innerWidth/2;
-    cameraOrtho.right = window.innerWidth/2;
-    cameraOrtho.top = window.innerHeight/2;
-    cameraOrtho.bottom = -window.innerHeight/2;
+    cameraOrtho.left = -width/2;
+    cameraOrtho.right = width/2;
+    cameraOrtho.top = height/2;
+    cameraOrtho.bottom = height/2;
     cameraOrtho.updateProjectionMatrix();
 
-    //if (spriteNameArr != 0 && spaseArr[8] != null)
+    if (infoArr != null)
     {
-        //for (var i = 0; i < spriteNameArr.length; i++)
+        for (var i = 0; i < infoArr.length-1; i++)
         {
-            //updateHUDSprites(spriteNameArr[i], spaseArr[i+1]);
+            console.log('какашка');
+            updateHUDSprites(infoArr[i]);
         }
     }
 
     // Изменение соотношения сторон рендера
-    renderer.setSize( window.innerWidth-30, window.innerHeight-30 );
+    renderer.setSize( window.innerWidth-30, window.innerHeight-30);
 }
 
 // В этой функции можно изменять параметры объектов и обрабатывать действия пользователя
@@ -141,11 +143,10 @@ function animate()
 //рисование кадра
 function render()
 {
-    //renderer.clear();
-    renderer.render(scene, camera);
-    ///renderer.clearDepth();
-    // Рисование кадра
-    //renderer.render( sceneOrtho, cameraOrtho );
+    renderer.clear();
+    renderer.render( scene, camera );
+    renderer.clearDepth();
+    renderer.render( sceneOrtho, cameraOrtho );
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -166,7 +167,16 @@ function AddSolarSystem()
     
     spaseArr[9] = AddStar(2000, 0, "starmap", -0.001);
 
-    moon = AddPlanet(2, 164, "moonmap1k", 1,023)
+    moon = AddPlanet(2, 164, "moonmap1k", 1,023);
+
+    infoArr[0] = AddSpriteInfo('mercury');
+    infoArr[1] = AddSpriteInfo('venus');
+    infoArr[2] = AddSpriteInfo('earth');
+    infoArr[3] = AddSpriteInfo('mars');
+    infoArr[4] = AddSpriteInfo('jupiter');
+    infoArr[5] = AddSpriteInfo('saturn');
+    infoArr[6] = AddSpriteInfo('uranus');
+    infoArr[7] = AddSpriteInfo('neptune');
 }
 
 // радиус, координата по x, текстура
@@ -205,7 +215,7 @@ function AddPlanet(rad, x, thistex, vel)
         rad: rad,
         nameSprt: nameSprt
     };
- console.log(planet);
+    
     return planet;
 }
 
@@ -378,63 +388,98 @@ function CameraLookAt()
                 case 0:
                     keyDown = 0;
                     for (var i = 1; i < 9; i++)
+                    {
                         spaseArr[i].nameSprt.visible = true;
+                        infoArr[i-1].visible = false;
+                    }
                     break;
                 
                 // look at Mercury    
                 case 1:
                     keyDown = 1;
                     for (var i = 1; i < 9; i++)
+                    {
                         spaseArr[i].nameSprt.visible = false;
+                        infoArr[i-1].visible = false;
+                        infoArr[keyDown-1].visible = true;
+                    }
                     break;
                 
                 // look at Venus    
                 case 2:
                     keyDown = 2;
                     for (var i = 1; i < 9; i++)
+                    {
                         spaseArr[i].nameSprt.visible = false;
+                        infoArr[i-1].visible = false;
+                        infoArr[keyDown-1].visible = true;
+                    }
                     break;
 
                 // look at Earth    
                 case 3:
                     keyDown = 3;
                     for (var i = 1; i < 9; i++)
+                    {
                         spaseArr[i].nameSprt.visible = false;
+                        infoArr[i-1].visible = false;
+                        infoArr[keyDown-1].visible = true;
+                    }
                     break;
 
                 // look at Mars    
                 case 4:
                     keyDown = 4;
                     for (var i = 1; i < 9; i++)
+                    {
                         spaseArr[i].nameSprt.visible = false;
+                        infoArr[i-1].visible = false;
+                        infoArr[keyDown-1].visible = true;
+                    }
                     break;
 
                 // look at Jupiter    
                 case 5:
                     keyDown = 5;
                     for (var i = 1; i < 9; i++)
+                    {
                         spaseArr[i].nameSprt.visible = false;
+                        infoArr[i-1].visible = false;
+                        infoArr[keyDown-1].visible = true;
+                    }
                     break;
 
                 // look at Saturn    
                 case 6:
                     keyDown = 6;
                     for (var i = 1; i < 9; i++)
+                    {
                         spaseArr[i].nameSprt.visible = false;
+                        infoArr[i-1].visible = false;
+                        infoArr[keyDown-1].visible = true;
+                    }
                     break;
 
                 // look at Uranus    
                 case 7:
                     keyDown = 7;
                     for (var i = 1; i < 9; i++)
+                    {
                         spaseArr[i].nameSprt.visible = false;
+                        infoArr[i-1].visible = false;
+                        infoArr[keyDown-1].visible = true;
+                    }
                     break;
 
                 // look at Neptun    
                 case 8:
                     keyDown = 8;
                     for (var i = 1; i < 9; i++)
+                    {
                         spaseArr[i].nameSprt.visible = false;
+                        infoArr[i-1].visible = false;
+                        infoArr[keyDown-1].visible = true;
+                    }
                     break;
 
                 default: break;
@@ -480,13 +525,12 @@ function StarRotation(star)
     star.body.matrixAutoUpdate = false;
 }
 
-function updateHUDSprites()
+function updateHUDSprites(sprite)
 {
-    var width = window.innerWidth/2;
-    var height = window.innerHeight/2;
-    
     // левый верхний угол экрана
-    
+    //sprite.position.set(width/2, height/2, 1);
+    sprite.position.set(window.innerWidth/2, window.innerHeight/2, 1);
+    console.log(sprite.position);
 }
 
 function AddSpriteName(planet, pos, rad)
@@ -503,16 +547,13 @@ function AddSpriteName(planet, pos, rad)
 
     scene.add(sprite);
 
-    console.log('add name' + ' ' + planet);
+    //console.log('add name' + ' ' + planet);
 
     return sprite;
 }
 
 function AddSpriteInfo(name)
 {
-    var width = window.innerWidth/2;
-    var height = window.innerHeight/2;
-    
     //загрузка текстуры спрайта
     var texture = loader.load("textures/info/" + name + ".png");
     var material = new THREE.SpriteMaterial( { map: texture } );
@@ -520,12 +561,17 @@ function AddSpriteInfo(name)
     //создание спрайта
     var sprite = new THREE.Sprite(material);
     //центр и размер спрайта
-    sprite.center.set( 0.0, 1.0 );
-    sprite.scale.set( 60, 15, 1 );
-    sprite.position.set();
+    sprite.center.set( 1, 1 );
+    sprite.scale.set( 700, 250, 1 );
+    //sprite.position.set(width/2, height/2, 1);
+    sprite.position.set(window.innerWidth/2, window.innerHeight/2, 1);
+    sprite.visible = false;
 
     sceneOrtho.add(sprite);
     //updateHUDSprites(sprite);
+    //var width = window.innerWidth;
+    //var height = window.innerHeight;
+    console.log('add info ' + name);
 
     return sprite;
 }
