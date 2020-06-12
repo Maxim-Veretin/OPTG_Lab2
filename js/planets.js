@@ -15,13 +15,11 @@ var keyDown = 0;
 var cameraAngle = 0;
 
 var cameraOrtho, sceneOrtho;
-//var spriteNameArr  = [];
-//var infoArr  = [];
-//#endregion
 
 var width = window.innerWidth;
 var height = window.innerHeight;
-var test;
+//#endregion
+
 // функция инициализации камеры, отрисовщика, объектов сцены и т.д.
 init();
 // обновление данных по таймеру браузера
@@ -207,7 +205,7 @@ function AddPlanet(rad, x, thistex, vel)
         rad: rad,
         nameSprt: nameSprt
     };
-
+ console.log(planet);
     return planet;
 }
 
@@ -379,46 +377,64 @@ function CameraLookAt()
                 // look at Solar System
                 case 0:
                     keyDown = 0;
+                    for (var i = 1; i < 9; i++)
+                        spaseArr[i].nameSprt.visible = true;
                     break;
                 
                 // look at Mercury    
                 case 1:
                     keyDown = 1;
+                    for (var i = 1; i < 9; i++)
+                        spaseArr[i].nameSprt.visible = false;
                     break;
                 
                 // look at Venus    
                 case 2:
                     keyDown = 2;
+                    for (var i = 1; i < 9; i++)
+                        spaseArr[i].nameSprt.visible = false;
                     break;
 
                 // look at Earth    
                 case 3:
                     keyDown = 3;
+                    for (var i = 1; i < 9; i++)
+                        spaseArr[i].nameSprt.visible = false;
                     break;
 
                 // look at Mars    
                 case 4:
                     keyDown = 4;
+                    for (var i = 1; i < 9; i++)
+                        spaseArr[i].nameSprt.visible = false;
                     break;
 
                 // look at Jupiter    
                 case 5:
                     keyDown = 5;
+                    for (var i = 1; i < 9; i++)
+                        spaseArr[i].nameSprt.visible = false;
                     break;
 
                 // look at Saturn    
                 case 6:
                     keyDown = 6;
+                    for (var i = 1; i < 9; i++)
+                        spaseArr[i].nameSprt.visible = false;
                     break;
 
                 // look at Uranus    
                 case 7:
                     keyDown = 7;
+                    for (var i = 1; i < 9; i++)
+                        spaseArr[i].nameSprt.visible = false;
                     break;
 
                 // look at Neptun    
                 case 8:
                     keyDown = 8;
+                    for (var i = 1; i < 9; i++)
+                        spaseArr[i].nameSprt.visible = false;
                     break;
 
                 default: break;
@@ -481,16 +497,15 @@ function AddSpriteName(planet, pos, rad)
 
     //создание спрайта
     var sprite = new THREE.Sprite(material);
+
     //центр и размер спрайта
     sprite.center.set(0.5, 1);
-    sprite.scale.set( 1, 1, 1 );
-    sprite.position.set(pos.x, rad*2.5, pos.z);
 
     scene.add(sprite);
 
-    console.log('add name' + planet);
-    return sprite;
+    console.log('add name' + ' ' + planet);
 
+    return sprite;
 }
 
 function AddSpriteInfo(name)
