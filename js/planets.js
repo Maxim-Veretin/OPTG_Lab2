@@ -507,9 +507,7 @@ function AddSpriteInfo(name)
     //центр и размер спрайта
     sprite.center.set( 0.0, 1.0 );
     sprite.scale.set( 60, 15, 1 );
-    sprite.position.set(planet.position.x + planet.rad, 
-                        planet.rad*2,
-                        planet.position.z);
+    sprite.position.set();
 
     sceneOrtho.add(sprite);
     //updateHUDSprites(sprite);
