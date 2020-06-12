@@ -13,8 +13,15 @@ var delta;
 var keyboard = new THREEx.KeyboardState();
 var keyDown = 0;
 var cameraAngle = 0;
+
+var cameraOrtho, sceneOrtho;
+//var spriteNameArr  = [];
+//var infoArr  = [];
 //#endregion
 
+var width = window.innerWidth;
+var height = window.innerHeight;
+var test;
 // функция инициализации камеры, отрисовщика, объектов сцены и т.д.
 init();
 // обновление данных по таймеру браузера
@@ -27,6 +34,11 @@ function init()
     container = document.getElementById( 'container' );
     // создание сцены
     scene = new THREE.Scene();
+
+    sceneOrtho = new THREE.Scene();
+    cameraOrtho = new THREE.OrthographicCamera( -width /2, width /2, height /2,
+                                                -height /2, 1, 10 );
+    cameraOrtho.position.z = 10;
 
     //FOV камеры, соотношение сторон, полоскости отсечения
     camera = new THREE.PerspectiveCamera(
@@ -57,15 +69,26 @@ function init()
     //Добавление функции обработки события изменения размеров окна
     window.addEventListener( 'resize', onWindowResize, false );
 
+    var spotlight = new THREE.PointLight(0xffff00);
+    spotlight.position.set(0, 0, 0);
+    spotlight.castShadow = true;
+    spotlight.shadow = new THREE.LightShadow(new THREE.PerspectiveCamera(45, 1, 10, 1000));
+    spotlight.shadow.bias = 0.0001;
+    spotlight.shadow.mapSize.width = 2048;
+    spotlight.shadow.mapSize.height = 2048;
+    scene.add(spotlight);
+    
+    //render.autoClear = false;
+
+    //var light = new THREE.AmbientLight( 0x202020 ); // soft white light
+    //scene.add( light );
+
     AddSolarSystem();
+    
     for(var i = 1; i < spaseArr.length; i++)
     {
         DrawOrbit(spaseArr[i]);
     }
-
-    var light = new THREE.PointLight(0xffa420, 1, 1300);
-    light.position.set(0, 0, 0);
-    scene.add(light);
 }
 
 // Обработка события изменения размеров окна
@@ -75,8 +98,22 @@ function onWindowResize()
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
 
+    cameraOrtho.left = -window.innerWidth/2;
+    cameraOrtho.right = window.innerWidth/2;
+    cameraOrtho.top = window.innerHeight/2;
+    cameraOrtho.bottom = -window.innerHeight/2;
+    cameraOrtho.updateProjectionMatrix();
+
+    //if (spriteNameArr != 0 && spaseArr[8] != null)
+    {
+        //for (var i = 0; i < spriteNameArr.length; i++)
+        {
+            //updateHUDSprites(spriteNameArr[i], spaseArr[i+1]);
+        }
+    }
+
     // Изменение соотношения сторон рендера
-    renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.setSize( window.innerWidth-30, window.innerHeight-30 );
 }
 
 // В этой функции можно изменять параметры объектов и обрабатывать действия пользователя
@@ -88,7 +125,7 @@ function animate()
     {
         MovePlanet(spaseArr[i]);
     }
-
+    
     for (var i = 0; i < 10; i += 9)
     {
         StarRotation(spaseArr[i]);
@@ -96,7 +133,7 @@ function animate()
     
     CameraLookAt();
     LookAtPlanet(keyDown);
-    MoonMove()
+    MoonMove();
 
     // Добавление функции на вызов, при перерисовки браузером страницы
     requestAnimationFrame( animate );
@@ -106,23 +143,28 @@ function animate()
 //рисование кадра
 function render()
 {
+    //renderer.clear();
+    renderer.render(scene, camera);
+    ///renderer.clearDepth();
     // Рисование кадра
-    renderer.render( scene, camera );
+    //renderer.render( sceneOrtho, cameraOrtho );
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //создание планет
 function AddSolarSystem()
 {
     spaseArr[0] = AddStar(80, 0, "8k_sun", 0.1);
     
-    spaseArr[1] = AddPlanet(2.5, 80+14.5, "mercurymap", 4,8);
-    spaseArr[2] = AddPlanet(6.1, 80+41, "venusmap", 3.5);
-    spaseArr[3] = AddPlanet(6.4, 80+70, "earthmap1k", 2.978);
-    spaseArr[4] = AddPlanet(3.4, 80+110, "marsmap1k", 2.4);
-    spaseArr[5] = AddPlanet(35, 80+200, "jupitermap", 1.307);
-    spaseArr[6] = AddPlanet(30, 80+379.5, "saturnmap", 0.969);
-    spaseArr[7] = AddPlanet(21, 80+544.85, "uranusmap", 0.681);
-    spaseArr[8] = AddPlanet(20, 767.5, "neptunemap", 0.435);
+    spaseArr[1] = AddPlanet(2.5, 80+14.5, 'mercury', 4,8);
+    spaseArr[2] = AddPlanet(6.1, 80+41, 'venus', 3.5);
+    spaseArr[3] = AddPlanet(6.4, 80+70, 'earth', 2.978);
+    spaseArr[4] = AddPlanet(3.4, 80+110, 'mars', 2.4);
+    spaseArr[5] = AddPlanet(35, 80+200, 'jupiter', 1.307);
+    spaseArr[6] = AddPlanet(30, 80+379.5, 'saturn', 0.969);
+    spaseArr[7] = AddPlanet(21, 80+544.85, 'uranus', 0.681);
+    spaseArr[8] = AddPlanet(20, 767.5, 'neptune', 0.435);
     
     spaseArr[9] = AddStar(2000, 0, "starmap", -0.001);
 
@@ -142,6 +184,8 @@ function AddPlanet(rad, x, thistex, vel)
     // создание материала
     var material = new THREE.MeshBasicMaterial({
         map: tex,
+        //visible: false,
+        //wireframe: true,
         side: THREE.DoubleSide
     });
 
@@ -149,7 +193,10 @@ function AddPlanet(rad, x, thistex, vel)
     var sphere = new THREE.Mesh( geometry, material );
     var posSphere = new THREE.Vector3(x, 0, 0);
     sphere.position.copy(posSphere);
+    sphere.receiveShadow = true;
     scene.add(sphere);
+
+    var nameSprt = AddSpriteName(thistex, posSphere, rad);
 
     //создание объекта планеты
     var planet = {
@@ -157,7 +204,8 @@ function AddPlanet(rad, x, thistex, vel)
         posX: posSphere.x,
         angle: 0,
         velocity: vel/5,
-        rad: rad
+        rad: rad,
+        nameSprt: nameSprt
     };
 
     return planet;
@@ -170,6 +218,9 @@ function MovePlanet(planet)
     var m = new THREE.Matrix4();
     var m1 = new THREE.Matrix4();
     var m2 = new THREE.Matrix4();
+    var m3 = new THREE.Matrix4();
+    var m4 = new THREE.Matrix4();
+    var m5 = new THREE.Matrix4();
     planet.angle += planet.velocity * delta;
 
     //создание матрицы поворота (вокруг оси Y) в m1 и матрицы перемещения в m2 
@@ -183,6 +234,15 @@ function MovePlanet(planet)
     //установка m в качестве матрицы преобразований объекта object 
     planet.body.matrix = m;
     planet.body.matrixAutoUpdate = false;
+
+    m3.setPosition(new THREE.Vector3(0, planet.rad*1.5, 0));
+    m5.makeScale(100.0, 30.0, 1.0);
+    m4.multiplyMatrices(m1, m2);
+    m4.multiplyMatrices(m4, m3);
+    m4.multiplyMatrices(m4, m5);
+
+    planet.nameSprt.matrix = m4;
+    planet.nameSprt.matrixAutoUpdate = false;
 }
 
 //ф-я движения луны
@@ -402,4 +462,57 @@ function StarRotation(star)
     //установка m в качестве матрицы преобразований объекта object 
     star.body.matrix = m;
     star.body.matrixAutoUpdate = false;
+}
+
+function updateHUDSprites()
+{
+    var width = window.innerWidth/2;
+    var height = window.innerHeight/2;
+    
+    // левый верхний угол экрана
+    
+}
+
+function AddSpriteName(planet, pos, rad)
+{
+    //загрузка текстуры спрайта
+    var texture = loader.load("textures/names/" + planet + ".png");
+    var material = new THREE.SpriteMaterial( { map: texture } );
+
+    //создание спрайта
+    var sprite = new THREE.Sprite(material);
+    //центр и размер спрайта
+    sprite.center.set(0.5, 1);
+    sprite.scale.set( 1, 1, 1 );
+    sprite.position.set(pos.x, rad*2.5, pos.z);
+
+    scene.add(sprite);
+
+    console.log('add name' + planet);
+    return sprite;
+
+}
+
+function AddSpriteInfo(name)
+{
+    var width = window.innerWidth/2;
+    var height = window.innerHeight/2;
+    
+    //загрузка текстуры спрайта
+    var texture = loader.load("textures/info/" + name + ".png");
+    var material = new THREE.SpriteMaterial( { map: texture } );
+
+    //создание спрайта
+    var sprite = new THREE.Sprite(material);
+    //центр и размер спрайта
+    sprite.center.set( 0.0, 1.0 );
+    sprite.scale.set( 60, 15, 1 );
+    sprite.position.set(planet.position.x + planet.rad, 
+                        planet.rad*2,
+                        planet.position.z);
+
+    sceneOrtho.add(sprite);
+    //updateHUDSprites(sprite);
+
+    return sprite;
 }
